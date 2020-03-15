@@ -7,7 +7,7 @@
 #include <random>
 
 using namespace std;
-
+extern set<Point> pointSet;
 int main(int argc, char** argv)
 {
 	ifstream infile;
@@ -71,6 +71,9 @@ int main(int argc, char** argv)
 		}
 	}
 	outfile << pointSet.size() << endl;	
+	for (Point p : pointSet) {
+		cout << p.pointX << "  " << p.pointY << endl;
+	}
 	return 0;
 }
 

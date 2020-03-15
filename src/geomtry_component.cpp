@@ -1,60 +1,62 @@
 #include "geomtry_component.h"
 
-straight::straight(double x0, double y0, double x1, double y1)
+
+set<Point> pointSet;
+
+Straight::Straight(double x0, double y0, double x1, double y1)
 	: Line(x0, y0, x1, y1)
 {
 }
 
-straight::~straight()
+Straight::~Straight()
 {
 }
 
-ray::ray(double x0, double y0, double x1, double y1)
-	: Line(x0, y0, x1, y1), start(x0, y0), orient(x1, y1)
-{
-
-}
-
-ray::~ray()
+Ray::~Ray()
 {
 }
 
-bool ray::is_on_self(Point& p)
+bool Ray::is_on_self(Point& p)
 {
-	return ((orient.pointX - start.pointX) * (p.pointX - start.pointX)) >= 0;
+	return ((end.pointX - ((Ray* )this)->start.pointX) * (p.pointX - start.pointX)) >= 0;
 }
 
-segment::segment(double x0, double y0, double x1, double y1)
-	: Line(x0, y0, x1, y1), start(x0, y0), end(x1, y1)
-{
-}
-
-segment::~segment()
+Segment::Segment(double x0, double y0, double x1, double y1)
+	: Line(x0, y0, x1, y1)
 {
 }
 
-bool segment::is_on_self(Point& p)
+Segment::~Segment()
+{
+}
+
+bool Segment::is_on_self(Point& p)
 {
 	return ((p.pointX - start.pointX) * (p.pointX - end.pointX)) <= 0;
 }
 
-int Line::GetCrossPoint(Line& l1)
+int Line::GetCrossPoint(Line* l1)
 {
 	double D;
-	D = l1.a * this->b - this->a * l1.b;
+	D = l1->a * this->b - this->a * l1->b;
 	if (!D)
 	{
 		return 0;
 	}
 	Point pTemp(0, 0);
-	pTemp.pointX = (l1.b * this->c - this->b * l1.c) / D;
-	pTemp.pointY = (l1.c * this->a - this->c * l1.a) / D;
-	if (!is_on_self(pTemp) || !l1.is_on_self(pTemp))
+	pTemp.pointX = (l1->b * this->c - this->b * l1->c) / D;
+	pTemp.pointY = (l1->c * this->a - this->c * l1->a) / D;
+	if (!is_on_self(pTemp) || !l1->is_on_self(pTemp))
 	{
 		return 0;
 	}
 	pointSet.insert(pTemp);
 	return 1;
+}
+
+bool Line::is_on_self(Point& p)
+{
+	return true;
 }
 
 int Circle::GetCrossToCircle(Circle c1)

@@ -1,5 +1,6 @@
 #include <unordered_set>
 #include <set>
+#include <iostream>
 
 #ifndef _GEOMETRY_H_
 #define _GEOMETRY_H_
@@ -33,20 +34,18 @@ public:
 	double a;
 	double b;
 	double c;
+	Point start;
+	Point end;
 public:
 	//Line() {};
-	Line(double x0, double y0, double x1, double y1) {
+	Line(double x0, double y0, double x1, double y1) : start(x0, y0), end(x1, y1) {
 		a = y1 - y0;
 		b = x0 - x1;
 		c = x1 * y0 - x0 * y1;
 	};
-	Line(double x0, double y0, double x1) {
-		a = x0;
-		b = y0;
-		c = x1;
-	};
-	virtual int GetCrossPoint(Line& l1);
-	virtual inline bool is_on_self(Point& p) = 0;   // The Point p must be on the straight defined by a, b and c.
+	
+	int GetCrossPoint(Line* l1);
+	virtual bool is_on_self(Point& p);   // The Point p must be on the straight defined by a, b and c.
 
 	bool operator< (const Line& l1)const {
 		return memcmp(this, &l1, sizeof(l1)) < 0;
@@ -59,7 +58,7 @@ public:
 	Straight(double x0, double y0, double x1, double y1);
 	~Straight();
 
-	virtual inline bool is_on_self(Point& p) { return true; }
+	virtual bool is_on_self(Point& p) { return true; }
 private:
 
 };
@@ -69,13 +68,11 @@ private:
 class Ray : public Line
 {
 public:
-	Point start;
-	Point orient;
 
-	Ray(double x0, double y0, double x1, double y1);
+	Ray(double x0, double y0, double x1, double y1) : Line(x0, y0, x1, y1) {};
 	~Ray();
 
-	virtual inline bool is_on_self(Point& p);
+	virtual bool is_on_self(Point& p);
 
 private:
 
@@ -84,13 +81,11 @@ private:
 class Segment : public Line
 {
 public:
-	Point start;
-	Point end;
-
+	
 	Segment(double x0, double y0, double x1, double y1);
 	~Segment();
 
-	virtual inline bool is_on_self(Point& p);
+	virtual bool is_on_self(Point& p) override;
 
 private:
 
@@ -109,5 +104,5 @@ public:
 	}
 };
 
-set<Point> pointSet;
+extern set<Point> pointSet;
 #endif // !_GEOMETRY_H_

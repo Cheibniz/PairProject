@@ -2,7 +2,7 @@
 
 #ifndef _TABLE_H_
 #define _TABLE_H_
-
+extern set<Point> pointSet;
 class Table
 {
 public:
@@ -14,7 +14,7 @@ public:
 
 private:
 	int n;
-	set<Line> lineSet;
+	set<Line*> lineSet;
 	set<Circle> circleSet;
 };
 

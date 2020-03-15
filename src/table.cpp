@@ -13,19 +13,19 @@ Table::~Table()
 
 void Table::insertLine(Line& l)
 {
-	for (Line temp : lineSet) {
-		Point tp = l.GetCrossPoint(temp);
+	for (auto temp : lineSet) {
+		temp->GetCrossPoint(&l);
 	}
 	for (Circle temp : circleSet) {
 		temp.GetCrossToLine(l);
 	}
-	lineSet.insert(l);
+	lineSet.insert(&l);
 }
 
-void Table::insertCircle(Circle& c)
+void Table::insertCircle(Circle& circle)
 {
-	for (Line temp : lineSet) {
-		circle.GetCrossToLine(temp);
+	for (auto temp : lineSet) {
+		circle.GetCrossToLine(*temp);
 	}
 	for (Circle temp : circleSet)
 	{
