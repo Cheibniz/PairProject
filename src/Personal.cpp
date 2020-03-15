@@ -39,8 +39,8 @@ int main(int argc, char** argv)
 			case 'L':
 			{
 				infile >> x0 >> y0 >> x1 >> y1;
-				Straight straight(x0, y0, x1, y1);
-				table.insertLine(straight);
+				Straight* straight = new Straight(x0, y0, x1, y1);
+				table.insertLine(*straight);
 				break;
 			}
 			case 'R':
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 	}
 	outfile << pointSet.size() << endl;	
 	for (Point p : pointSet) {
-		cout << p.pointX << "  " << p.pointY << endl;
+		//cout << p.pointX << "  " << p.pointY << endl;
 	}
 	return 0;
 }
