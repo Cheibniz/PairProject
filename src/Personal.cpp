@@ -27,8 +27,14 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 	Table table = Table();
-	table.insertFromFile(infile);
-	outfile << table.getPointNum() << endl;	
+	table.insertFromStream(infile);
+	outfile << table.getPointNum() << endl;
+	Circle circle = Circle(Point(0, 0), 1);
+	table.eraseCircle(circle);
+	cout << table.getPointNum() << endl;
+	circle = Circle(Point(2, 0), 1);
+	table.eraseCircle(circle);
+	cout << table.getPointNum() << endl;
 	return 0;
 }
 

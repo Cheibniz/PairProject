@@ -11,18 +11,18 @@ Table::Table()
 Table::~Table()
 {}
 
-set<Point> Table::getPointSet()
+set<Point>& Table::getPointSet()
 {
 	return pointSet;
 }
 
-set<Line*> Table::getLineSet()
+set<Line*>& Table::getLineSet()
 {
 	return lineSet;
 }
 
 
-set<Circle> Table::getCircleSet()
+set<Circle>& Table::getCircleSet()
 {
 	return circleSet;
 }
@@ -101,7 +101,7 @@ void Table::insertCircle(Circle& circle)
 	circleSet.insert(circle);
 }
 
-void Table::insertFromFile(ifstream& infile)
+void Table::insertFromStream(ifstream& infile)
 {
 	char type;
 	double x0, x1, y0, y1;

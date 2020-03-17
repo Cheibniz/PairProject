@@ -16,10 +16,10 @@ public:
 
 	void insertLine(Line& l);
 	void insertCircle(Circle& c);
-	void insertFromFile(ifstream& infile);
-	set<Point> getPointSet();
-	set<Line*> getLineSet();
-	set<Circle> getCircleSet();
+	void insertFromStream(ifstream& infile);
+	set<Point>& getPointSet();
+	set<Line*>& getLineSet();
+	set<Circle>& getCircleSet();
 	void eraseLine(Line* l);
 	void eraseCircle(Circle& c);
 	size_t getPointNum();
