@@ -27,6 +27,10 @@ public:
 		}
 		return true;
 	}
+
+	bool operator== (const Point p1)const {
+		return (abs(pointX - p1.pointX) < EPS && abs(pointY - p1.pointY) < EPS);
+	}
 };
 
 class Line {
@@ -44,12 +48,14 @@ public:
 		c = x1 * y0 - x0 * y1;
 	};
 	
-	int GetCrossPoint(Line* l1);
+	int GetCrossPoint(set<Point>& pointSet,Line* l1);
 	virtual bool is_on_self(Point& p);   // The Point p must be on the straight defined by a, b and c.
 
 	bool operator< (const Line& l1)const {
 		return memcmp(this, &l1, sizeof(l1)) < 0;
 	}
+
+	bool operator== (const Line& l1)const;
 };
 
 class Straight : public Line
@@ -97,12 +103,12 @@ public:
 	Point center;
 	double r;
 	Circle(Point p, double i) : center(p), r(i) {};
-	int GetCrossToCircle(Circle c1);
-	int GetCrossToLine(Line& l1);
+	int GetCrossToCircle(set<Point>& pointSet, Circle c1);
+	int GetCrossToLine(set<Point>& pointSet, Line& l1);
 	bool operator< (const Circle c1)const {
 		return memcmp(this, &c1, sizeof(c1)) < 0;
 	}
-};
 
-extern set<Point> pointSet;
+	bool operator== (const Circle c1)const;
+};
 #endif // !_GEOMETRY_H_

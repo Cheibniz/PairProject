@@ -1,8 +1,5 @@
 #include "geomtry_component.h"
 
-
-set<Point> pointSet;
-
 Straight::Straight(double x0, double y0, double x1, double y1)
 	: Line(x0, y0, x1, y1)
 {
@@ -31,7 +28,7 @@ bool Segment::is_on_self(Point& p)
 	return ((p.pointX - start.pointX) * (p.pointX - end.pointX)) <= 0;
 }
 
-int Line::GetCrossPoint(Line* l1)
+int Line::GetCrossPoint(set<Point>& pointSet, Line* l1)
 {
 	double D;
 	D = l1->a * this->b - this->a * l1->b;
@@ -55,7 +52,20 @@ bool Line::is_on_self(Point& p)
 	return true;
 }
 
-int Circle::GetCrossToCircle(Circle c1)
+// a1b2-a2b1=0,b1c2-b2c1=0
+bool Line::operator== (const Line& l1)const
+{
+	double B, D;
+	D = l1.a * this->b - this->a * l1.b;
+	B = b * l1.c - l1.b * c;
+	if (abs(D - 0) < EPS && abs(B - 0) < EPS)
+	{
+		return true;
+	}
+	return false;
+}
+
+int Circle::GetCrossToCircle(set<Point>& pointSet, Circle c1)
 {
 	double a1, b1, r1, a0, b0, r0;
 	a0 = center.pointX;
@@ -81,7 +91,7 @@ int Circle::GetCrossToCircle(Circle c1)
 	return 2;
 }
 
-int Circle::GetCrossToLine(Line& l1)
+int Circle::GetCrossToLine(set<Point>& pointSet, Line& l1)
 {
 	double a0 = l1.a, b0 = l1.b, c0 = l1.c, a1 = center.pointX, b1 = center.pointY, r1 = r;
 	double a12 = a1 * a1, b12 = b1 * b1, r12 = r1 * r1, a02 = a0 * a0, b02 = b0 * b0, c02 = c0 * c0;
@@ -104,4 +114,9 @@ int Circle::GetCrossToLine(Line& l1)
 		pointSet.insert(cross2);
 	}
 	return 2;
+}
+
+bool Circle::operator== (const Circle c1)const
+{
+	return (center == c1.center) && abs(r - c1.r) < EPS;
 }
