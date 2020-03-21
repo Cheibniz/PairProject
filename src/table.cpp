@@ -1,5 +1,7 @@
 #include"table.h"
-
+#include<regex>
+#include <sstream>
+#include "error.h"
 Table::Table() 
 {
 	n = 0;
@@ -30,6 +32,11 @@ set<Circle>& Table::getCircleSet()
 size_t Table::getPointNum()
 {
 	return pointSet.size();
+}
+
+vector<exception>& Table::getExceptions()
+{
+	return exceptVector;
 }
 
 void Table::eraseLine(Line* l)
@@ -81,6 +88,10 @@ void Table::updatePointSet()
 void Table::insertLine(Line& l)
 {
 	for (auto temp : lineSet) {
+		if (*temp == l)
+		{
+			throw Doublication();
+		}
 		temp->GetCrossPoint(pointSet ,&l);
 	}
 	for (Circle temp : circleSet) {
@@ -96,53 +107,78 @@ void Table::insertCircle(Circle& circle)
 	}
 	for (Circle temp : circleSet)
 	{
+		if (temp == circle)
+		{
+			throw Doublication();
+		}
 		circle.GetCrossToCircle(pointSet, temp);
 	}
 	circleSet.insert(circle);
 }
 
-void Table::insertFromStream(ifstream& infile)
+void Table::insertFromString(string& inStream)
 {
-	char type;
-	double x0, x1, y0, y1;
-	infile >> n;
-	for (int i = 0; i < n; i++)
-	{
-		infile >> type;
-		switch (type)
-		{
-		case 'L':
-		{
-			infile >> x0 >> y0 >> x1 >> y1;
-			Straight* straight = new Straight(x0, y0, x1, y1);
-			insertLine(*straight);
-			break;
-		}
-		case 'R':
-		{
-			infile >> x0 >> y0 >> x1 >> y1;
-			Ray* ray = new Ray(x0, y0, x1, y1);
-			insertLine(*ray);
-			break;
-		}
-		case 'S':
-		{
-			infile >> x0 >> y0 >> x1 >> y1;
-			Segment* segment = new Segment(x0, y0, x1, y1);
-			insertLine(*segment);
-			break;
-		}
-		case 'C':
-		{
-			infile >> x0 >> y0 >> x1;
-			Circle circle(Point(x0, y0), x1);
-			insertCircle(circle);
-			break;
-		}
-		default:
-		{
-			// dealing the wrong!
-		}
-		}
+	regex reg1("\\s+((L|R|S)\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+) | (C\\s+\\d+\\s+\\d+\\s+\\d+\\s+)");
+	regex reg3("\\s*((L|R|S)\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+)|(C\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0*[1-9]\\d{0,4}))\\s*");
+
+	if (!regex_match(inStream, reg3)) {
+		//throw domain_error(inStream);
 	}
+	stringstream stream;
+	stream << inStream;
+	char type;
+	int x0, x1, y0, y1;
+	stream >> type;
+
+	
+	switch (type)
+	{
+	case 'L':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		if (Point(x0, y0) == Point(x1, y1))
+		{
+			throw pointDoublication();
+		}
+		Straight* straight = new Straight(x0, y0, x1, y1);
+		insertLine(*straight);
+		break;
+	}
+	case 'R':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		if (Point(x0, y0) == Point(x1, y1))
+		{
+			throw pointDoublication();
+		}
+		Ray* ray = new Ray(x0, y0, x1, y1);
+		insertLine(*ray);
+		break;
+	}
+	case 'S':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		if (Point(x0, y0) == Point(x1, y1))
+		{
+			throw pointDoublication();
+		}
+		Segment* segment = new Segment(x0, y0, x1, y1);
+		insertLine(*segment);
+		break;
+	}
+	case 'C':
+	{
+		stream >> x0 >> y0 >> x1;
+		
+		Circle circle(Point(x0, y0), x1);
+		insertCircle(circle);
+		break;
+	}
+	default:
+	{
+		// dealing the wrong!
+		cout << "Here is unreachable" << endl;
+	}
+	}
+	
 }

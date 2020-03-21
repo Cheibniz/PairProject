@@ -16,20 +16,20 @@ public:
 
 	void insertLine(Line& l);
 	void insertCircle(Circle& c);
-	void insertFromStream(ifstream& infile);
+	void insertFromString(string& infile);
 	set<Point>& getPointSet();
 	set<Line*>& getLineSet();
 	set<Circle>& getCircleSet();
 	void eraseLine(Line* l);
 	void eraseCircle(Circle& c);
 	size_t getPointNum();
-
+	vector<exception>& getExceptions();
 private:
 	int n;
 	set<Point> pointSet;
 	set<Line*> lineSet;
 	set<Circle> circleSet;
-
+	vector<exception> exceptVector;
 	void updatePointSet();
 };
 
