@@ -190,7 +190,7 @@ void CMFCGUIDlg::OnBnClickedImportButton()
 	{
 		readFile(path);
 	}
-	catch (const std::exception&)
+	catch(const exception&)
 	{
 		m_EXCEPTMESSAGE = CString(_T("读取文件出现错误,请重启程序"));
 		UpdateData(FALSE);
@@ -244,7 +244,15 @@ void CMFCGUIDlg::OnBnClickedGet()
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	pair<vector<string>, vector<Point>> result;
-	result = getResult();
+	try
+	{
+		result = getResult();
+	}
+	catch (const std::exception&)
+	{
+		m_EXCEPTMESSAGE = CString(_T("出现错误,请重启程序"));
+		UpdateData(FALSE);
+	}
 	
 	m_ResultValue = result.second.size();
 	UpdateData(FALSE);
@@ -255,7 +263,15 @@ void CMFCGUIDlg::OnBnClickedDraw()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	pair<vector<string>, vector<Point>> result;
-	result = getResult();
+	try
+	{
+		result = getResult();
+	}
+	catch (const std::exception&)
+	{
+		m_EXCEPTMESSAGE = CString(_T("出现错误,请重启程序"));
+		UpdateData(FALSE);
+	}
 	
 	initgraph(640, 480);
 	setbkcolor(WHITE);
