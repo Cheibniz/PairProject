@@ -1,10 +1,7 @@
 #include"table.h"
-#include<regex>
-#include <sstream>
-#include "error.h"
+
 Table::Table() 
 {
-	n = 0;
 	lineSet.clear();
 	circleSet.clear();
 	pointSet.clear();
@@ -18,7 +15,7 @@ set<Point>& Table::getPointSet()
 	return pointSet;
 }
 
-set<Line*>& Table::getLineSet()
+set<Line*, LinePtrCmp>& Table::getLineSet()
 {
 	return lineSet;
 }
@@ -41,15 +38,7 @@ vector<exception>& Table::getExceptions()
 
 void Table::eraseLine(Line* l)
 {
-	
-	for (auto i = lineSet.begin(); i != lineSet.end(); i++)
-	{
-		if (**i == *l)
-		{
-			lineSet.erase(i);
-			break;
-		}
-	}
+	lineSet.erase(l);
 	updatePointSet();
 }
 
@@ -87,11 +76,11 @@ void Table::updatePointSet()
 
 void Table::insertLine(Line& l)
 {
+	if (lineSet.count(&l) > 0)
+	{
+		throw Doublication(l.toString());
+	}
 	for (auto temp : lineSet) {
-		if (*temp == l)
-		{
-			throw Doublication();
-		}
 		temp->GetCrossPoint(pointSet ,&l);
 	}
 	for (Circle temp : circleSet) {
@@ -102,15 +91,15 @@ void Table::insertLine(Line& l)
 
 void Table::insertCircle(Circle& circle)
 {
+	if (circleSet.count(circle) > 0)
+	{
+		throw Doublication(circle.toString());
+	}
 	for (auto temp : lineSet) {
 		circle.GetCrossToLine(pointSet ,*temp);
 	}
 	for (Circle temp : circleSet)
 	{
-		if (temp == circle)
-		{
-			throw Doublication();
-		}
 		circle.GetCrossToCircle(pointSet, temp);
 	}
 	circleSet.insert(circle);
@@ -118,11 +107,20 @@ void Table::insertCircle(Circle& circle)
 
 void Table::insertFromString(string& inStream)
 {
-	regex reg1("\\s+((L|R|S)\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+) | (C\\s+\\d+\\s+\\d+\\s+\\d+\\s+)");
-	regex reg3("\\s*((L|R|S)\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+)|(C\\s+(0+|0*[1-9]\\d{0,4})\\s+(0+|0*[1-9]\\d{0,4})\\s+(0*[1-9]\\d{0,4}))\\s*");
+	static string number = "(0*[1-9]\\d{0,4})";
+	static string radius = "(\\+?" + number + ")";
+	static string number0 = "((0+)|(" + number + "))";
+	static string snumber0 = "([+-]?" + number0 + ")";
+	static regex reg(
+		"\\s*("
+		"([LRS]\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + snumber0 + ")"
+		"|"
+		"(C\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + radius + ")"
+		")\\s*"
+	);
 
-	if (!regex_match(inStream, reg3)) {
-		//throw domain_error(inStream);
+	if (!regex_match(inStream, reg)) {
+		throw domain_error(inStream);
 	}
 	stringstream stream;
 	stream << inStream;
@@ -136,10 +134,6 @@ void Table::insertFromString(string& inStream)
 	case 'L':
 	{
 		stream >> x0 >> y0 >> x1 >> y1;
-		if (Point(x0, y0) == Point(x1, y1))
-		{
-			throw pointDoublication();
-		}
 		Straight* straight = new Straight(x0, y0, x1, y1);
 		insertLine(*straight);
 		break;
@@ -147,10 +141,6 @@ void Table::insertFromString(string& inStream)
 	case 'R':
 	{
 		stream >> x0 >> y0 >> x1 >> y1;
-		if (Point(x0, y0) == Point(x1, y1))
-		{
-			throw pointDoublication();
-		}
 		Ray* ray = new Ray(x0, y0, x1, y1);
 		insertLine(*ray);
 		break;
@@ -158,10 +148,6 @@ void Table::insertFromString(string& inStream)
 	case 'S':
 	{
 		stream >> x0 >> y0 >> x1 >> y1;
-		if (Point(x0, y0) == Point(x1, y1))
-		{
-			throw pointDoublication();
-		}
 		Segment* segment = new Segment(x0, y0, x1, y1);
 		insertLine(*segment);
 		break;
@@ -176,9 +162,69 @@ void Table::insertFromString(string& inStream)
 	}
 	default:
 	{
-		// dealing the wrong!
-		cout << "Here is unreachable" << endl;
+		cout << "Here should be  unreachable" << endl;
 	}
 	}
-	
+}
+
+void Table::eraseFromString(string& erase)
+{
+	static string number = "(0*[1-9]\\d{0,4})";
+	static string radius = "(\\+?" + number + ")";
+	static string number0 = "((0+)|(" + number + "))";
+	static string snumber0 = "([+-]?" + number0 + ")";
+	static regex reg(
+		"\\s*("
+		"([LRS]\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + snumber0 + ")"
+		"|"
+		"(C\\s+" + snumber0 + "\\s+" + snumber0 + "\\s+" + radius + ")"
+		")\\s*"
+	);
+
+	if (!regex_match(erase, reg)) {
+		throw domain_error(erase);
+	}
+	stringstream stream;
+	stream << erase;
+	char type;
+	int x0, x1, y0, y1;
+	stream >> type;
+
+
+	switch (type)
+	{
+	case 'L':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		Straight* straight = new Straight(x0, y0, x1, y1);
+		eraseLine(straight);
+		break;
+	}
+	case 'R':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		Ray* ray = new Ray(x0, y0, x1, y1);
+		eraseLine(ray);
+		break;
+	}
+	case 'S':
+	{
+		stream >> x0 >> y0 >> x1 >> y1;
+		Segment* segment = new Segment(x0, y0, x1, y1);
+		eraseLine(segment);
+		break;
+	}
+	case 'C':
+	{
+		stream >> x0 >> y0 >> x1;
+
+		Circle circle(Point(x0, y0), x1);
+		eraseCircle(circle);
+		break;
+	}
+	default:
+	{
+		cout << "Here should be  unreachable" << endl;
+	}
+	}
 }

@@ -6,10 +6,16 @@ using namespace std;
 class Doublication : public exception
 {
 public:
-	Doublication() {};
-	const char* what()
+	string messege;
+
+	Doublication(string m)
 	{
-		return "Component Doublication";
+		messege = m;
+	};
+
+	const char* what() const
+	{
+		return messege.c_str();
 	}
 private:
 
@@ -18,10 +24,16 @@ private:
 class pointDoublication : public exception
 {
 public:
-	pointDoublication() {};
-	const char* what()
+	string messege;
+
+	pointDoublication(string m)
 	{
-		return "point Doublication";
+		messege = m;
+	}
+
+	const char* what() const
+	{
+		return messege.c_str();
 	}
 private:
 
